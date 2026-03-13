@@ -7,9 +7,8 @@ import matplotlib.pyplot as plt
 # --- CONFIGURACIÓN DE PÁGINA ---
 st.set_page_config(page_title="Teoría de los Efectos Olvidados", layout="wide", page_icon="📊")
 
-# --- FUNCIONES MATEMÁTICAS (De teofinal.py) ---
+# --- FUNCIONES MATEMÁTICAS ---
 def max_min_composition(matrix1, matrix2):
-    """Calcula la composición max-min de dos matrices."""
     rows1, cols1 = matrix1.shape
     rows2, cols2 = matrix2.shape
     if cols1 != rows2:
@@ -27,11 +26,9 @@ def max_min_composition(matrix1, matrix2):
     return result_matrix
 
 def subtract_matrices(matrix_m2, matrix_m1):
-    """Calcula la matriz de Efectos Olvidados (M2 - M1)."""
     return np.maximum(0, matrix_m2 - matrix_m1)
 
 def load_and_clean_csv(uploaded_file):
-    """Lee el CSV, asegura que sea numérico y lo recorta al rango [0, 1]."""
     df = pd.read_csv(uploaded_file, index_col=0)
     df = df.apply(pd.to_numeric, errors='coerce').fillna(0)
     df = df.clip(0, 1)
@@ -39,7 +36,6 @@ def load_and_clean_csv(uploaded_file):
 
 # --- FUNCIONES DE VISUALIZACIÓN ---
 def draw_incidence_graph(matrix, source_labels, target_labels, title):
-    """Genera el grafo bipartito general."""
     G = nx.DiGraph()
     source_nodes = [f"S_{label}" for label in source_labels]
     target_nodes = [f"T_{label}" for label in target_labels]
@@ -75,7 +71,6 @@ def draw_incidence_graph(matrix, source_labels, target_labels, title):
     return fig
 
 def draw_focused_graph(center_node, connected_nodes, weights, title, mode='source'):
-    """Genera el grafo egocéntrico para el Modo Inspector."""
     G = nx.DiGraph()
     G.add_node(center_node, layer=0)
     
@@ -125,15 +120,18 @@ if "1." in modo:
         st.subheader("1. Matriz Original (Directa)")
         st.dataframe(df.style.format("{:.3f}"))
         
+        # Guardamos en memoria si el botón fue presionado
         if st.button("🚀 Procesar Efectos Olvidados", type="primary"):
-            # Cálculos
+            st.session_state['procesado_m1'] = True
+            
+        # Si está en memoria, mostramos todo (esto evita que desaparezca)
+        if st.session_state.get('procesado_m1', False):
             m2 = max_min_composition(matriz_np, matriz_np)
             efectos = subtract_matrices(m2, matriz_np)
             
             df_m2 = pd.DataFrame(m2, index=labels, columns=labels)
             df_efectos = pd.DataFrame(efectos, index=labels, columns=labels)
             
-            # Mostrar Resultados en Pestañas
             tab1, tab2 = st.tabs(["📊 Matriz de Segundo Orden (M²)", "🔍 Matriz de Efectos Olvidados (M² - M)"])
             
             with tab1:
@@ -160,7 +158,6 @@ if "1." in modo:
             if elemento != "-- Seleccione --":
                 colA, colB = st.columns(2)
                 
-                # Análisis como CAUSA (Fila)
                 with colA:
                     st.markdown(f"### '{elemento}' como CAUSA")
                     valores_causa = df_efectos.loc[elemento]
@@ -173,7 +170,6 @@ if "1." in modo:
                     else:
                         st.info(f"'{elemento}' no genera efectos olvidados hacia otros nodos.")
 
-                # Análisis como EFECTO (Columna)
                 with colB:
                     st.markdown(f"### '{elemento}' como EFECTO")
                     valores_efecto = df_efectos[elemento]
@@ -199,17 +195,20 @@ elif "2." in modo:
         df1 = load_and_clean_csv(archivo_m1)
         df2 = load_and_clean_csv(archivo_m2)
         
-        # Validar dimensiones
         if len(df1.columns) != len(df2.index):
             st.error(f"⚠️ Error de dimensión: Las columnas de M1 ({len(df1.columns)}) no coinciden con las filas de M2 ({len(df2.index)}).")
         else:
             st.success("Matrices compatibles cargadas con éxito.")
             
-            # Opción para matriz directa
             st.markdown("**(Opcional)** Para calcular los Efectos Olvidados, puede subir la matriz de incidencia directa (A → C).")
             archivo_m_directa = st.file_uploader("3️⃣ Suba Matriz Directa (A → C) [.csv] (Opcional)", type=['csv'])
             
+            # Guardamos en memoria si el botón fue presionado
             if st.button("🚀 Procesar Composición", type="primary"):
+                st.session_state['procesado_m2'] = True
+                
+            # Si está en memoria, mostramos todo
+            if st.session_state.get('procesado_m2', False):
                 resultado = max_min_composition(df1.values, df2.values)
                 labels_A = list(df1.index)
                 labels_C = list(df2.columns)
@@ -238,7 +237,7 @@ elif "2." in modo:
                             with c2:
                                 st.pyplot(draw_incidence_graph(efectos, labels_A, labels_C, "Red de Efectos Olvidados"))
                             
-                            # MODO INSPECTOR para Encadenado
+                            # --- MODO INSPECTOR ---
                             st.divider()
                             st.header("🕵️‍♂️ Modo Inspector")
                             tipo_inspeccion = st.radio("¿Qué desea inspeccionar?", ["Elemento Causa (Conjunto A)", "Elemento Efecto (Conjunto C)"], horizontal=True)
