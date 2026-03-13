@@ -124,7 +124,7 @@ if "1." in modo:
         if st.button("🚀 Procesar Efectos Olvidados", type="primary"):
             st.session_state['procesado_m1'] = True
             
-        # Si está en memoria, mostramos todo (esto evita que desaparezca)
+        # Si está en memoria, mostramos todo
         if st.session_state.get('procesado_m1', False):
             m2 = max_min_composition(matriz_np, matriz_np)
             efectos = subtract_matrices(m2, matriz_np)
@@ -165,7 +165,8 @@ if "1." in modo:
                     df_causa = df_causa[df_causa['Incidencia'] > 0].sort_values(by='Incidencia', ascending=False)
                     
                     if not df_causa.empty:
-                        st.dataframe(df_causa.style.format("{:.3f}"), hide_index=True)
+                        # CORRECCIÓN AQUÍ: Solo formateamos la columna 'Incidencia'
+                        st.dataframe(df_causa.style.format({'Incidencia': "{:.3f}"}), hide_index=True)
                         st.pyplot(draw_focused_graph(elemento, df_causa['Efecto'].tolist(), df_causa['Incidencia'].tolist(), f"Impactos indirectos de '{elemento}'", mode='source'))
                     else:
                         st.info(f"'{elemento}' no genera efectos olvidados hacia otros nodos.")
@@ -177,7 +178,8 @@ if "1." in modo:
                     df_efecto = df_efecto[df_efecto['Incidencia'] > 0].sort_values(by='Incidencia', ascending=False)
                     
                     if not df_efecto.empty:
-                        st.dataframe(df_efecto.style.format("{:.3f}"), hide_index=True)
+                        # CORRECCIÓN AQUÍ: Solo formateamos la columna 'Incidencia'
+                        st.dataframe(df_efecto.style.format({'Incidencia': "{:.3f}"}), hide_index=True)
                         st.pyplot(draw_focused_graph(elemento, df_efecto['Causa'].tolist(), df_efecto['Incidencia'].tolist(), f"Causas ocultas que inciden en '{elemento}'", mode='target'))
                     else:
                         st.info(f"Ningún nodo genera efectos olvidados hacia '{elemento}'.")
@@ -248,7 +250,10 @@ elif "2." in modo:
                                     valores = df_efectos.loc[elemento]
                                     df_foc = pd.DataFrame({'Efecto Final (C)': labels_C, 'Incidencia': valores})
                                     df_foc = df_foc[df_foc['Incidencia'] > 0].sort_values(by='Incidencia', ascending=False)
-                                    st.dataframe(df_foc.style.format("{:.3f}"), hide_index=True)
+                                    
+                                    # CORRECCIÓN AQUÍ: Solo formateamos la columna 'Incidencia'
+                                    st.dataframe(df_foc.style.format({'Incidencia': "{:.3f}"}), hide_index=True)
+                                    
                                     if not df_foc.empty:
                                         st.pyplot(draw_focused_graph(elemento, df_foc['Efecto Final (C)'].tolist(), df_foc['Incidencia'].tolist(), f"Impactos de '{elemento}'", mode='source'))
                             else:
@@ -257,7 +262,10 @@ elif "2." in modo:
                                     valores = df_efectos[elemento]
                                     df_foc = pd.DataFrame({'Causa Raíz (A)': labels_A, 'Incidencia': valores})
                                     df_foc = df_foc[df_foc['Incidencia'] > 0].sort_values(by='Incidencia', ascending=False)
-                                    st.dataframe(df_foc.style.format("{:.3f}"), hide_index=True)
+                                    
+                                    # CORRECCIÓN AQUÍ: Solo formateamos la columna 'Incidencia'
+                                    st.dataframe(df_foc.style.format({'Incidencia': "{:.3f}"}), hide_index=True)
+                                    
                                     if not df_foc.empty:
                                         st.pyplot(draw_focused_graph(elemento, df_foc['Causa Raíz (A)'].tolist(), df_foc['Incidencia'].tolist(), f"Causas que impactan a '{elemento}'", mode='target'))
                         else:
