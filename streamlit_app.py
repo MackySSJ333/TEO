@@ -102,12 +102,19 @@ st.markdown("Automatización de incidencias de orden superior y descubrimiento d
 
 modo = st.radio(
     "Seleccione la topología de su análisis:", 
-    ["1. Sistemas Cerrados (Matriz Cuadrada / Auto-incidencia)", "2. Sistemas Encadenados (Dos Matrices A -> B -> C)"],
-    horizontal=True
+    [
+        "1. Sistemas Cerrados (Matriz Única A → A)", 
+        "2. Sistemas Encadenados (Dos Matrices A → B → C)",
+        "3. Cadenas Complejas (Tres Matrices A → B → C → D)" # NUEVO MODO
+    ],
+    horizontal=False
 )
 
 st.divider()
 
+# ==========================================
+# MODO 1: UNA MATRIZ
+# ==========================================
 if "1." in modo:
     st.header("Análisis de Sistemas Cerrados (A → A)")
     archivo_m1 = st.file_uploader("Suba su Matriz de Incidencias (.csv)", type=['csv'])
@@ -120,11 +127,9 @@ if "1." in modo:
         st.subheader("1. Matriz Original (Directa)")
         st.dataframe(df.style.format("{:.3f}"))
         
-        # Guardamos en memoria si el botón fue presionado
         if st.button("🚀 Procesar Efectos Olvidados", type="primary"):
             st.session_state['procesado_m1'] = True
             
-        # Si está en memoria, mostramos todo
         if st.session_state.get('procesado_m1', False):
             m2 = max_min_composition(matriz_np, matriz_np)
             efectos = subtract_matrices(m2, matriz_np)
@@ -133,98 +138,75 @@ if "1." in modo:
             df_efectos = pd.DataFrame(efectos, index=labels, columns=labels)
             
             tab1, tab2 = st.tabs(["📊 Matriz de Segundo Orden (M²)", "🔍 Matriz de Efectos Olvidados (M² - M)"])
-            
             with tab1:
                 col1, col2 = st.columns([1, 1.5])
-                with col1:
-                    st.dataframe(df_m2.style.format("{:.3f}"))
-                with col2:
-                    st.pyplot(draw_incidence_graph(m2, labels, labels, "Red de Incidencias (2do Orden)"))
-            
+                with col1: st.dataframe(df_m2.style.format("{:.3f}"))
+                with col2: st.pyplot(draw_incidence_graph(m2, labels, labels, "Red de Incidencias (2do Orden)"))
             with tab2:
                 col1, col2 = st.columns([1, 1.5])
-                with col1:
-                    st.dataframe(df_efectos.style.format("{:.3f}"))
-                with col2:
-                    st.pyplot(draw_incidence_graph(efectos, labels, labels, "Red de Efectos Olvidados"))
+                with col1: st.dataframe(df_efectos.style.format("{:.3f}"))
+                with col2: st.pyplot(draw_incidence_graph(efectos, labels, labels, "Red de Efectos Olvidados"))
             
-            # --- MODO INSPECTOR ---
+            # Modo Inspector
             st.divider()
             st.header("🕵️‍♂️ Modo Inspector Focalizado")
-            st.markdown("Aísle un elemento para analizar su comportamiento como Causa (emisor) o como Efecto (receptor).")
-            
             elemento = st.selectbox("Seleccione el elemento a inspeccionar:", ["-- Seleccione --"] + labels)
             
             if elemento != "-- Seleccione --":
                 colA, colB = st.columns(2)
-                
                 with colA:
                     st.markdown(f"### '{elemento}' como CAUSA")
                     valores_causa = df_efectos.loc[elemento]
                     df_causa = pd.DataFrame({'Efecto': labels, 'Incidencia': valores_causa})
                     df_causa = df_causa[df_causa['Incidencia'] > 0].sort_values(by='Incidencia', ascending=False)
-                    
                     if not df_causa.empty:
-                        # CORRECCIÓN AQUÍ: Solo formateamos la columna 'Incidencia'
                         st.dataframe(df_causa.style.format({'Incidencia': "{:.3f}"}), hide_index=True)
                         st.pyplot(draw_focused_graph(elemento, df_causa['Efecto'].tolist(), df_causa['Incidencia'].tolist(), f"Impactos indirectos de '{elemento}'", mode='source'))
-                    else:
-                        st.info(f"'{elemento}' no genera efectos olvidados hacia otros nodos.")
-
+                    else: st.info(f"'{elemento}' no genera efectos olvidados hacia otros nodos.")
                 with colB:
                     st.markdown(f"### '{elemento}' como EFECTO")
                     valores_efecto = df_efectos[elemento]
                     df_efecto = pd.DataFrame({'Causa': labels, 'Incidencia': valores_efecto})
                     df_efecto = df_efecto[df_efecto['Incidencia'] > 0].sort_values(by='Incidencia', ascending=False)
-                    
                     if not df_efecto.empty:
-                        # CORRECCIÓN AQUÍ: Solo formateamos la columna 'Incidencia'
                         st.dataframe(df_efecto.style.format({'Incidencia': "{:.3f}"}), hide_index=True)
                         st.pyplot(draw_focused_graph(elemento, df_efecto['Causa'].tolist(), df_efecto['Incidencia'].tolist(), f"Causas ocultas que inciden en '{elemento}'", mode='target'))
-                    else:
-                        st.info(f"Ningún nodo genera efectos olvidados hacia '{elemento}'.")
+                    else: st.info(f"Ningún nodo genera efectos olvidados hacia '{elemento}'.")
 
+# ==========================================
+# MODO 2: DOS MATRICES
+# ==========================================
 elif "2." in modo:
     st.header("Análisis de Sistemas Encadenados (A → B → C)")
     
     col1, col2 = st.columns(2)
-    with col1:
-        archivo_m1 = st.file_uploader("1️⃣ Suba Matriz 1 (A → B) [.csv]", type=['csv'])
-    with col2:
-        archivo_m2 = st.file_uploader("2️⃣ Suba Matriz 2 (B → C) [.csv]", type=['csv'])
+    with col1: archivo_m1 = st.file_uploader("1️⃣ Suba Matriz 1 (A → B)", type=['csv'])
+    with col2: archivo_m2 = st.file_uploader("2️⃣ Suba Matriz 2 (B → C)", type=['csv'])
         
     if archivo_m1 and archivo_m2:
         df1 = load_and_clean_csv(archivo_m1)
         df2 = load_and_clean_csv(archivo_m2)
         
         if len(df1.columns) != len(df2.index):
-            st.error(f"⚠️ Error de dimensión: Las columnas de M1 ({len(df1.columns)}) no coinciden con las filas de M2 ({len(df2.index)}).")
+            st.error(f"⚠️ Error: Columnas de M1 ({len(df1.columns)}) no coinciden con filas de M2 ({len(df2.index)}).")
         else:
-            st.success("Matrices compatibles cargadas con éxito.")
+            st.success("Matrices compatibles.")
+            archivo_m_directa = st.file_uploader("3️⃣ Suba Matriz Directa (A → C) [Opcional para Efectos Olvidados]", type=['csv'])
             
-            st.markdown("**(Opcional)** Para calcular los Efectos Olvidados, puede subir la matriz de incidencia directa (A → C).")
-            archivo_m_directa = st.file_uploader("3️⃣ Suba Matriz Directa (A → C) [.csv] (Opcional)", type=['csv'])
-            
-            # Guardamos en memoria si el botón fue presionado
             if st.button("🚀 Procesar Composición", type="primary"):
                 st.session_state['procesado_m2'] = True
                 
-            # Si está en memoria, mostramos todo
             if st.session_state.get('procesado_m2', False):
                 resultado = max_min_composition(df1.values, df2.values)
                 labels_A = list(df1.index)
                 labels_C = list(df2.columns)
                 df_res = pd.DataFrame(resultado, index=labels_A, columns=labels_C)
                 
-                tab1, tab2 = st.tabs(["📊 Matriz Resultante de Composición", "🔍 Efectos Olvidados"])
-                
+                tab1, tab2 = st.tabs(["📊 Matriz Resultante", "🔍 Efectos Olvidados"])
                 with tab1:
-                    st.write("Resultado de la composición Max-Min (A → C):")
                     c1, c2 = st.columns([1, 1.5])
-                    with c1:
-                        st.dataframe(df_res.style.format("{:.3f}"))
-                    with c2:
-                        st.pyplot(draw_incidence_graph(resultado, labels_A, labels_C, "Red de Composición Max-Min"))
+                    with c1: st.dataframe(df_res.style.format("{:.3f}"))
+                    with c2: st.pyplot(draw_incidence_graph(resultado, labels_A, labels_C, "Red de Composición"))
                 
                 with tab2:
                     if archivo_m_directa:
@@ -232,43 +214,109 @@ elif "2." in modo:
                         if df_dir.shape == df_res.shape:
                             efectos = subtract_matrices(resultado, df_dir.values)
                             df_efectos = pd.DataFrame(efectos, index=labels_A, columns=labels_C)
-                            
                             c1, c2 = st.columns([1, 1.5])
-                            with c1:
-                                st.dataframe(df_efectos.style.format("{:.3f}"))
-                            with c2:
-                                st.pyplot(draw_incidence_graph(efectos, labels_A, labels_C, "Red de Efectos Olvidados"))
+                            with c1: st.dataframe(df_efectos.style.format("{:.3f}"))
+                            with c2: st.pyplot(draw_incidence_graph(efectos, labels_A, labels_C, "Red de Efectos Olvidados"))
                             
-                            # --- MODO INSPECTOR ---
+                            # MODO INSPECTOR DOS MATRICES...
                             st.divider()
                             st.header("🕵️‍♂️ Modo Inspector")
-                            tipo_inspeccion = st.radio("¿Qué desea inspeccionar?", ["Elemento Causa (Conjunto A)", "Elemento Efecto (Conjunto C)"], horizontal=True)
-                            
-                            if "Causa" in tipo_inspeccion:
-                                elemento = st.selectbox("Seleccione un elemento Causa:", ["-- Seleccione --"] + labels_A)
-                                if elemento != "-- Seleccione --":
-                                    valores = df_efectos.loc[elemento]
-                                    df_foc = pd.DataFrame({'Efecto Final (C)': labels_C, 'Incidencia': valores})
-                                    df_foc = df_foc[df_foc['Incidencia'] > 0].sort_values(by='Incidencia', ascending=False)
-                                    
-                                    # CORRECCIÓN AQUÍ: Solo formateamos la columna 'Incidencia'
-                                    st.dataframe(df_foc.style.format({'Incidencia': "{:.3f}"}), hide_index=True)
-                                    
+                            tipo = st.radio("¿Qué desea inspeccionar?", ["Elemento Causa", "Elemento Efecto"], horizontal=True)
+                            if "Causa" in tipo:
+                                el = st.selectbox("Seleccione Causa:", ["--"] + labels_A)
+                                if el != "--":
+                                    df_foc = pd.DataFrame({'Efecto': labels_C, 'Incidencia': df_efectos.loc[el]})
+                                    df_foc = df_foc[df_foc['Incidencia']>0].sort_values('Incidencia', ascending=False)
                                     if not df_foc.empty:
-                                        st.pyplot(draw_focused_graph(elemento, df_foc['Efecto Final (C)'].tolist(), df_foc['Incidencia'].tolist(), f"Impactos de '{elemento}'", mode='source'))
+                                        st.dataframe(df_foc.style.format({'Incidencia': "{:.3f}"}), hide_index=True)
+                                        st.pyplot(draw_focused_graph(el, df_foc['Efecto'].tolist(), df_foc['Incidencia'].tolist(), f"Impactos de '{el}'", 'source'))
                             else:
-                                elemento = st.selectbox("Seleccione un elemento Efecto:", ["-- Seleccione --"] + labels_C)
-                                if elemento != "-- Seleccione --":
-                                    valores = df_efectos[elemento]
-                                    df_foc = pd.DataFrame({'Causa Raíz (A)': labels_A, 'Incidencia': valores})
-                                    df_foc = df_foc[df_foc['Incidencia'] > 0].sort_values(by='Incidencia', ascending=False)
-                                    
-                                    # CORRECCIÓN AQUÍ: Solo formateamos la columna 'Incidencia'
-                                    st.dataframe(df_foc.style.format({'Incidencia': "{:.3f}"}), hide_index=True)
-                                    
+                                el = st.selectbox("Seleccione Efecto:", ["--"] + labels_C)
+                                if el != "--":
+                                    df_foc = pd.DataFrame({'Causa': labels_A, 'Incidencia': df_efectos[el]})
+                                    df_foc = df_foc[df_foc['Incidencia']>0].sort_values('Incidencia', ascending=False)
                                     if not df_foc.empty:
-                                        st.pyplot(draw_focused_graph(elemento, df_foc['Causa Raíz (A)'].tolist(), df_foc['Incidencia'].tolist(), f"Causas que impactan a '{elemento}'", mode='target'))
-                        else:
-                            st.error("Las dimensiones de la matriz directa no coinciden con el resultado.")
-                    else:
-                        st.info("Suba la matriz directa (A → C) en el paso anterior para habilitar el cálculo de Efectos Olvidados y el Modo Inspector.")
+                                        st.dataframe(df_foc.style.format({'Incidencia': "{:.3f}"}), hide_index=True)
+                                        st.pyplot(draw_focused_graph(el, df_foc['Causa'].tolist(), df_foc['Incidencia'].tolist(), f"Causas hacia '{el}'", 'target'))
+                        else: st.error("Dimensiones incorrectas en la matriz directa.")
+                    else: st.info("Falta matriz directa.")
+
+# ==========================================
+# MODO 3: TRES MATRICES (EL QUE NECESITAS HOY)
+# ==========================================
+elif "3." in modo:
+    st.header("Análisis de Cadenas Complejas (A → B → C → D)")
+    
+    col1, col2, col3 = st.columns(3)
+    with col1: archivo_m1 = st.file_uploader("1️⃣ M1 (A → B) [Ej. Acciones.csv]", type=['csv'])
+    with col2: archivo_m2 = st.file_uploader("2️⃣ M2 (B → C) [Ej. EjemploP.csv]", type=['csv'])
+    with col3: archivo_m3 = st.file_uploader("3️⃣ M3 (C → D) [Ej. Cualidades.csv]", type=['csv'])
+        
+    if archivo_m1 and archivo_m2 and archivo_m3:
+        df1 = load_and_clean_csv(archivo_m1)
+        df2 = load_and_clean_csv(archivo_m2)
+        df3 = load_and_clean_csv(archivo_m3)
+        
+        # Validación en Cadena
+        if len(df1.columns) != len(df2.index):
+            st.error(f"⚠️ Las columnas de M1 ({len(df1.columns)}) no coinciden con las filas de M2 ({len(df2.index)}).")
+        elif len(df2.columns) != len(df3.index):
+            st.error(f"⚠️ Las columnas de M2 ({len(df2.columns)}) no coinciden con las filas de M3 ({len(df3.index)}).")
+        else:
+            st.success("✅ ¡Las tres matrices encajan a la perfección!")
+            
+            archivo_m_directa = st.file_uploader("4️⃣ Matriz Directa (A → D) [Opcional para Efectos Olvidados, Ej. EjemploP original]", type=['csv'])
+            
+            if st.button("🚀 Procesar Composición Triple", type="primary"):
+                st.session_state['procesado_m3'] = True
+                
+            if st.session_state.get('procesado_m3', False):
+                # Cálculo de tres pasos: (M1 o M2) o M3
+                paso1 = max_min_composition(df1.values, df2.values)
+                resultado_final = max_min_composition(paso1, df3.values)
+                
+                labels_A = list(df1.index)
+                labels_D = list(df3.columns)
+                df_res = pd.DataFrame(resultado_final, index=labels_A, columns=labels_D)
+                
+                tab1, tab2 = st.tabs(["📊 Matriz de Composición Triple", "🔍 Efectos Olvidados de 3ra Generación"])
+                
+                with tab1:
+                    st.write("Resultado global de A → D:")
+                    c1, c2 = st.columns([1, 1.5])
+                    with c1: st.dataframe(df_res.style.format("{:.3f}"))
+                    with c2: st.pyplot(draw_incidence_graph(resultado_final, labels_A, labels_D, "Red de Composición M1 o M2 o M3"))
+                
+                with tab2:
+                    if archivo_m_directa:
+                        df_dir = load_and_clean_csv(archivo_m_directa)
+                        if df_dir.shape == df_res.shape:
+                            efectos = subtract_matrices(resultado_final, df_dir.values)
+                            df_efectos = pd.DataFrame(efectos, index=labels_A, columns=labels_D)
+                            
+                            c1, c2 = st.columns([1, 1.5])
+                            with c1: st.dataframe(df_efectos.style.format("{:.3f}"))
+                            with c2: st.pyplot(draw_incidence_graph(efectos, labels_A, labels_D, "Efectos Olvidados Profundos"))
+                            
+                            # Inspector (idéntico)
+                            st.divider()
+                            st.header("🕵️‍♂️ Modo Inspector")
+                            tipo = st.radio("¿Qué desea inspeccionar?", ["Elemento Causa Final", "Elemento Efecto Final"], horizontal=True)
+                            if "Causa" in tipo:
+                                el = st.selectbox("Seleccione Causa (Origen):", ["--"] + labels_A)
+                                if el != "--":
+                                    df_foc = pd.DataFrame({'Efecto': labels_D, 'Incidencia': df_efectos.loc[el]})
+                                    df_foc = df_foc[df_foc['Incidencia']>0].sort_values('Incidencia', ascending=False)
+                                    if not df_foc.empty:
+                                        st.dataframe(df_foc.style.format({'Incidencia': "{:.3f}"}), hide_index=True)
+                                        st.pyplot(draw_focused_graph(el, df_foc['Efecto'].tolist(), df_foc['Incidencia'].tolist(), f"Impactos de '{el}'", 'source'))
+                            else:
+                                el = st.selectbox("Seleccione Efecto (Destino):", ["--"] + labels_D)
+                                if el != "--":
+                                    df_foc = pd.DataFrame({'Causa': labels_A, 'Incidencia': df_efectos[el]})
+                                    df_foc = df_foc[df_foc['Incidencia']>0].sort_values('Incidencia', ascending=False)
+                                    if not df_foc.empty:
+                                        st.dataframe(df_foc.style.format({'Incidencia': "{:.3f}"}), hide_index=True)
+                                        st.pyplot(draw_focused_graph(el, df_foc['Causa'].tolist(), df_foc['Incidencia'].tolist(), f"Causas hacia '{el}'", 'target'))
+                        else: st.error("Las dimensiones de la matriz directa no coinciden.")
+                    else: st.info("Sube la matriz directa (Paso 4) para calcular efectos olvidados y habilitar el inspector.")
