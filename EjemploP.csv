@@ -1,0 +1,17 @@
+Actividad,Buena imagen,Simpatía popular,Sensación de confianza,Seriedad,Firmeza de ideas,Acercamiento electorado,Popularidad,Competencia,Laboriosidad,Capacidad técnica,Prestigio personal,Honradez
+Declaraciones T.V.,0.9,0.7,1.0,0.8,1.0,0.8,0.7,0.5,0.1,0.4,0.3,0.2
+Noticias en T.V.,0.6,0.6,0.4,0.5,0.2,0.8,0.9,0.5,0.3,0.5,0.6,0.3
+Publicidad T.V.,0.7,0.9,0.5,0.3,0.7,1.0,0.8,0.6,0.3,0.2,0.1,0.2
+Declaraciones radio,0.0,0.3,0.4,0.5,0.7,0.5,0.2,0.3,0.1,0.4,0.2,0.2
+Noticias radio,0.0,0.1,0.2,0.1,0.4,0.0,0.3,0.2,0.0,0.3,0.5,0.2
+Publicidad radio,0.2,0.4,0.3,0.0,0.3,0.5,0.4,0.1,0.0,0.1,0.1,0.1
+Artículos prensa,0.1,0.0,0.1,0.6,0.7,0.0,0.0,0.8,0.6,1.0,0.9,0.3
+Noticias prensa,0.2,0.1,0.1,0.2,0.2,0.1,0.0,0.1,0.0,0.1,0.2,0.2
+Publicidad prensa,0.3,0.2,0.0,0.0,0.4,0.3,0.5,0.0,0.0,0.0,0.1,0.1
+Posters calles,0.5,0.6,0.0,0.0,0.0,0.8,0.7,0.0,0.0,0.0,0.0,0.0
+Coches publicitarios,0.0,0.0,0.0,0.0,0.0,0.2,0.3,0.0,0.0,0.0,0.0,0.0
+Publicación libro,0.1,0.1,0.0,0.4,0.1,0.0,0.2,0.9,0.8,0.7,1.0,0.4
+Conferencias,0.2,0.0,0.6,0.8,0.7,0.1,0.0,0.8,0.5,0.6,0.4,0.1
+Mitines políticos,0.3,0.6,0.7,0.4,0.9,0.7,0.8,0.3,0.2,0.0,0.2,0.6
+Reuniones de grupo,0.4,0.0,0.7,0.8,0.7,0.0,0.0,0.7,0.2,0.6,0.4,0.8
+Paseo mercados,0.7,0.8,0.5,0.0,0.0,1.0,0.7,0.0,0.0,0.0,0.0,0.0

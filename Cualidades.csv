@@ -1,0 +1,13 @@
+Cualidad,Buena imagen,Simpatía popular,Sensación de confianza,Seriedad,Firmeza de ideas,Acercamiento electorado,Popularidad,Competencia,Laboriosidad,Capacidad técnica,Prestigio personal,Honradez
+Buena imagen,1.0,0.5,0.6,0.6,0.2,0.8,0.8,0.3,0.1,0.2,0.3,0.5
+Simpatía popular,0.7,1.0,0.5,0.2,0.4,0.9,1.0,0.0,0.0,0.0,0.2,0.4
+Sensación de confianza,0.6,0.5,1.0,0.9,0.0,0.8,0.4,0.0,0.0,0.0,0.1,1.0
+Seriedad,0.3,0.0,0.7,1.0,0.5,0.0,0.0,0.2,0.1,0.0,0.5,0.5
+Firmeza de ideas,0.6,0.4,0.8,0.9,1.0,0.1,0.2,0.0,0.0,0.0,0.3,0.4
+Acercamiento electorado,0.2,1.0,0.9,0.0,0.0,1.0,1.0,0.0,0.0,0.0,0.0,0.0
+Popularidad,0.5,1.0,0.2,0.0,0.0,1.0,1.0,0.0,0.0,0.0,0.0,0.0
+Competencia,0.7,0.3,0.8,0.9,0.0,0.0,0.0,1.0,0.0,0.6,0.8,0.0
+Laboriosidad,0.7,0.7,0.5,0.4,0.0,0.0,0.1,0.3,1.0,0.8,0.6,0.0
+Capacidad técnica,0.5,0.1,0.0,0.4,0.0,0.0,0.2,0.9,0.0,1.0,0.7,0.0
+Prestigio personal,0.8,0.5,0.7,0.6,0.5,0.0,0.1,0.0,0.0,0.0,1.0,0.0
+Honradez,0.9,0.8,1.0,1.0,0.0,0.3,0.6,0.1,0.0,0.0,0.8,1.0

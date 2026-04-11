@@ -1,0 +1,17 @@
+Actividad,Declaraciones T.V.,Noticias en T.V.,Publicidad T.V.,Declaraciones radio,Noticias radio,Publicidad radio,Artículos prensa,Noticias prensa,Publicidad prensa,Posters calles,Coches publicitarios,Publicación libro,Conferencias,Mitines políticos,Reuniones de grupo,Paseo mercados
+Declaraciones T.V.,1.0,0.7,0.0,0.5,0.6,0.0,0.0,0.6,0.0,0.0,0.0,0.2,0.2,0.0,0.0,0.0
+Noticias en T.V.,0.4,1.0,0.0,0.0,0.4,0.0,0.0,0.4,0.0,0.0,0.0,0.0,0.1,0.0,0.4,0.0
+Publicidad T.V.,0.0,0.0,1.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.2,0.0,0.3,0.0
+Declaraciones radio,0.3,0.5,0.0,1.0,0.8,0.0,0.0,0.5,0.0,0.0,0.0,0.2,0.1,0.0,0.2,0.0
+Noticias radio,0.1,0.4,0.0,0.2,1.0,0.0,0.0,0.5,0.0,0.0,0.0,0.0,0.1,0.0,0.2,0.0
+Publicidad radio,0.0,0.0,0.0,0.0,0.0,1.0,0.0,0.0,0.0,0.0,0.0,0.0,0.2,0.0,0.2,0.0
+Artículos prensa,0.2,0.4,0.0,0.3,0.5,0.0,1.0,0.1,0.0,0.0,0.0,0.3,0.4,0.0,0.5,0.0
+Noticias prensa,0.3,0.4,0.0,0.2,0.5,0.0,0.0,1.0,0.0,0.0,0.0,0.0,0.3,0.0,0.4,0.0
+Publicidad prensa,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,1.0,0.0,0.0,0.0,0.0,0.0,0.4,0.0
+Posters calles,0.0,0.1,0.0,0.0,0.2,0.0,0.0,0.2,0.0,1.0,0.0,0.0,0.0,0.0,0.1,0.0
+Coches publicitarios,0.0,0.3,0.0,0.0,0.4,0.0,0.0,0.4,0.0,0.0,1.0,0.0,0.0,0.0,0.1,0.0
+Publicación libro,0.6,0.7,0.6,0.7,0.8,0.7,0.8,0.8,0.8,0.5,0.6,1.0,0.9,0.0,0.7,0.0
+Conferencias,0.1,0.6,0.0,0.3,0.7,0.0,0.6,0.7,0.0,0.0,0.0,0.7,1.0,0.0,0.6,0.0
+Mitines políticos,0.6,0.8,0.0,0.7,0.9,0.0,0.0,0.9,0.0,0.0,0.5,0.0,0.0,1.0,0.2,0.0
+Reuniones de grupo,0.1,0.4,0.0,0.2,0.5,0.0,0.0,0.5,0.0,0.0,0.0,0.0,0.2,0.0,1.0,0.0
+Paseo mercados,0.0,0.3,0.0,0.0,0.4,0.0,0.0,0.4,0.0,0.4,0.0,0.0,0.0,0.0,0.0,1.0
