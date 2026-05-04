@@ -161,6 +161,14 @@ def matrix_input_widget(key_prefix, titulo, row_hint="Causas (A)", col_hint="Efe
         col_labels = col_labels[:int(n_cols)]
 
         st.caption("Ingrese los valores de la matriz (entre 0.0 y 1.0). Puede editar cada celda directamente.")
+        st.info("""
+        **Nota Técnica: Validación Automática de Datos**
+
+        Durante la captura manual de datos o la importación desde archivos CSV, es común que existan errores de tipografía (por ejemplo, escribir 10 en lugar de 1.0, valores negativos o celdas vacías). 
+        * **Límite Superior (1.0):** Cualquier magnitud ingresada que sea mayor a 1 se asume como una verdad absoluta y es recortada automáticamente a `1.0`.
+        * **Límite Inferior (0.0):** Cualquier magnitud negativa es corregida a `0.0`.
+        * **Celdas Nulas o Inválidas:** Los espacios en blanco o textos son forzados a convertirse en `0.0` para evitar que el programa colapse.
+        """, icon="ℹ️")
         default_df = pd.DataFrame(
             np.zeros((int(n_filas), int(n_cols))),
             index=row_labels,
